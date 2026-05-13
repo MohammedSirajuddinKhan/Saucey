@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile | BiteMe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/site.css" />
+    <script src="/js/ui.js"></script>
+  </head>
+  <body class="detail-page">
+    <header class="topbar detail-topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">B</span>
+        <span>BiteMe</span>
+      </a>
+      <div class="top-actions">
+        <a class="ghost-link" href="/orders">Orders</a>
+        <a class="pill-link" href="/">Home</a>
+      </div>
+    </header>
+
+    <main class="detail-wrap">
+      <section class="detail-hero">
+        <div>
+          <p class="eyebrow">Profile</p>
+          <h1><%= viewer.username %></h1>
+          <p><%= viewer.email %></p>
+          <div class="feature-meta">
+            <span><%= viewer.usertype %></span>
+            <span><%= viewer.phone %></span>
+            <span><%= Array.isArray(viewer.address) && viewer.address.length ? viewer.address[0] : 'No saved address' %></span>
+          </div>
+        </div>
+        <div class="detail-metrics">
+          <div><strong><%= recentOrders.length %></strong><span>recent orders</span></div>
+          <div><strong><%= viewer.usertype %></strong><span>role</span></div>
+        </div>
+      </section>
+
+      <section class="section compact-section grid-two">
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Account</p>
+              <h2>Update your profile.</h2>
+            </div>
+          </div>
+          <form id="profileForm" class="stack-form">
+            <label>
+              <span>Username</span>
+              <input type="text" name="username" value="<%= viewer.username %>" required />
+            </label>
+            <label>
+              <span>Phone</span>
+              <input type="text" name="phone" value="<%= viewer.phone %>" required />
+            </label>
+            <label>
+              <span>Address</span>
+              <textarea name="address" rows="3" required><%= Array.isArray(viewer.address) ? viewer.address.join(', ') : (viewer.address || '') %></textarea>
+            </label>
+            <button type="submit" class="auth-button" data-loading-text="Updating profile...">Save profile</button>
+            <p class="form-message" data-form-status></p>
+          </form>
+        </article>
+
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Security</p>
+              <h2>Reset your password.</h2>
+            </div>
+          </div>
+          <form id="passwordForm" class="stack-form">
+            <label>
+              <span>Email</span>
+              <input type="email" name="email" value="<%= viewer.email %>" required />
+            </label>
+            <label>
+              <span>Security answer</span>
+              <input type="text" name="answer" placeholder="Your answer" required />
+            </label>
+            <label>
+              <span>New password</span>
+              <input type="password" name="newPassword" placeholder="New password" required />
+            </label>
+            <button type="submit" class="auth-button" data-loading-text="Resetting password...">Reset password</button>
+            <p class="form-message" data-form-status></p>
+          </form>
+        </article>
+      </section>
+
+      <section class="section compact-section">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Recent orders</p>
+            <h2>Your latest deliveries.</h2>
+          </div>
+          <a class="ghost-link" href="/orders">View all orders</a>
+        </div>
+        <div class="card-grid">
+          <% if (recentOrders.length) { %>
+            <% recentOrders.forEach((order) => { %>
+              <article class="restaurant-card order-card">
+                <div class="restaurant-body">
+                  <div class="card-row">
+                    <h3><%= order.restaurant?.title || 'Restaurant' %></h3>
+                    <span class="rating"><%= order.status %></span>
+                  </div>
+                  <p><%= order.address %></p>
+                  <div class="card-meta">
+                    <span>₹<%= order.total %></span>
+                    <span><%= order.paymentType %></span>
+                    <span><%= new Date(order.createdAt).toLocaleDateString() %></span>
+                  </div>
+                  <a href="/orders/<%= order._id %>">Track order</a>
+                </div>
+              </article>
+            <% }) %>
+          <% } else { %>
+            <div class="empty-state">No orders yet.</div>
+          <% } %>
+        </div>
+      </section>
+
+      <section class="section compact-section">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Danger zone</p>
+            <h2>Remove your account.</h2>
+          </div>
+        </div>
+        <form id="deleteForm" class="danger-form">
+          <button type="submit" class="danger-button" data-loading-text="Deleting account...">Delete account</button>
+          <p class="form-message" data-form-status></p>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      window.BiteMeUI.bindAsyncForm(document.getElementById('profileForm'), async ({ form, status, setStatusMessage }) => {
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+        const response = await fetch('/api/v1/user/updateUser', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Unable to update profile');
+        setStatusMessage(status, 'Profile updated successfully.', 'success');
+        setTimeout(() => window.location.reload(), 700);
+      });
+
+      window.BiteMeUI.bindAsyncForm(document.getElementById('passwordForm'), async ({ form, status, setStatusMessage }) => {
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+        const response = await fetch('/api/v1/user/resetPassword', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Unable to reset password');
+        setStatusMessage(status, 'Password updated successfully.', 'success');
+        form.reset();
+        form.email.value = '<%= viewer.email %>';
+      });
+
+      window.BiteMeUI.bindAsyncForm(document.getElementById('deleteForm'), async ({ status, setStatusMessage }) => {
+        const confirmDelete = window.confirm('Delete your account permanently?');
+        if (!confirmDelete) {
+          setStatusMessage(status, 'Deletion cancelled.', 'success');
+          return;
+        }
+        const response = await fetch('/api/v1/user/deleteAccount', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Unable to delete account');
+        setStatusMessage(status, 'Account removed. Redirecting...', 'success');
+        setTimeout(() => window.location.href = '/register', 900);
+      });
+    </script>
+  </body>
+</html>

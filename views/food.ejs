@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= food.title %> | BiteMe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/site.css" />
+    <script defer src="/js/ui.js"></script>
+  </head>
+  <body class="detail-page">
+    <header class="topbar detail-topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">B</span>
+        <span>BiteMe</span>
+      </a>
+      <div class="top-actions">
+        <a class="ghost-link" href="/restaurant/<%= food.restaurant._id %>">Restaurant</a>
+        <a class="pill-link" href="/orders">Orders</a>
+      </div>
+    </header>
+
+    <main class="detail-wrap">
+      <section class="detail-hero food-hero">
+        <div>
+          <p class="eyebrow">Food detail</p>
+          <h1><%= food.title %></h1>
+          <p><%= food.description || 'Freshly prepared and ready to order.' %></p>
+          <div class="feature-meta">
+            <span>₹<%= food.price %></span>
+            <span><%= food.restaurant?.title %></span>
+            <span><%= food.category?.title || 'Menu item' %></span>
+            <span><%= food.isAvailable ? 'Available now' : 'Sold out' %></span>
+          </div>
+        </div>
+        <div class="detail-metrics">
+          <div><strong><%= food.rating || '4.4' %></strong><span>rating</span></div>
+          <div><strong><%= food.restaurant?.time || '20' %></strong><span>mins</span></div>
+        </div>
+      </section>
+
+      <section class="section compact-section grid-two">
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">What is inside</p>
+              <h2>Ingredients and details.</h2>
+            </div>
+          </div>
+          <% if (food.ingredients && food.ingredients.length) { %>
+            <div class="pill-list">
+              <% food.ingredients.forEach((ingredient) => { %>
+                <span><%= ingredient %></span>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="empty-state compact-empty">No ingredients listed yet.</div>
+          <% } %>
+        </article>
+
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Restaurant</p>
+              <h2>Where this dish comes from.</h2>
+            </div>
+          </div>
+          <p class="panel-copy"><%= food.restaurant?.address %></p>
+          <div class="card-actions compact-actions">
+            <a href="/restaurant/<%= food.restaurant._id %>">Open restaurant</a>
+            <% if (viewer) { %>
+              <a href="/checkout/<%= food._id %>">Order now</a>
+            <% } else { %>
+              <a href="/login">Sign in to order</a>
+            <% } %>
+          </div>
+        </article>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Similar dishes</p>
+            <h2>More items from the same restaurant.</h2>
+          </div>
+        </div>
+        <div class="food-grid">
+          <% if (similarFoods.length) { %>
+            <% similarFoods.forEach((item) => { %>
+              <article class="food-card">
+                <div class="food-top">
+                  <span class="food-price">₹<%= item.price %></span>
+                  <span class="food-status"><%= item.isAvailable ? 'Available' : 'Sold out' %></span>
+                </div>
+                <h3><%= item.title %></h3>
+                <p><%= item.category?.title || 'Featured dish' %></p>
+                <div class="card-actions compact-actions">
+                  <a href="/food/<%= item._id %>">View details</a>
+                  <% if (viewer) { %>
+                    <a href="/checkout/<%= item._id %>">Checkout</a>
+                  <% } else { %>
+                    <a href="/login">Sign in</a>
+                  <% } %>
+                </div>
+              </article>
+            <% }) %>
+          <% } else { %>
+            <div class="empty-state">No similar dishes available yet.</div>
+          <% } %>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

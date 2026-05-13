@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | BiteMe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/site.css" />
+    <script defer src="/js/ui.js"></script>
+  </head>
+  <body class="auth-page">
+    <main class="auth-shell">
+      <section class="auth-brand-panel">
+        <a class="brand auth-brand" href="/">
+          <span class="brand-mark">B</span>
+          <span>BiteMe</span>
+        </a>
+        <p class="eyebrow">Welcome back</p>
+        <h1>Sign in and continue where you left off.</h1>
+        <p>
+          Browse restaurants, place orders, and manage your account from one
+          polished experience.
+        </p>
+        <div class="auth-points">
+          <div>Fast sign-in with your registered email</div>
+          <div>Connected to your BiteMe account</div>
+          <div>Your session stays ready on this device</div>
+        </div>
+      </section>
+
+      <section class="auth-card">
+        <div class="auth-card-head">
+          <p class="eyebrow">Login</p>
+          <h2>Enter your details to continue.</h2>
+          <p class="auth-helper">
+            New here? <a href="/register">Create an account</a>.
+          </p>
+        </div>
+
+        <form id="loginForm" class="auth-form">
+          <label>
+            <span>Email</span>
+            <input
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              required
+            />
+          </label>
+          <label>
+            <span>Password</span>
+            <input
+              type="password"
+              name="password"
+              placeholder="Your password"
+              required
+            />
+          </label>
+          <button type="submit" class="auth-button">Login</button>
+        </form>
+
+        <p id="loginMessage" class="auth-message"></p>
+        <a class="secondary-link" href="/">Back to home</a>
+      </section>
+    </main>
+
+    <section class="auth-inline-foot">
+      <div>
+        <strong>BiteMe</strong>
+        <span>Fast ordering. Clean design. Real food.</span>
+      </div>
+    </section>
+
+    <script>
+      const form = document.getElementById("loginForm");
+      const message = document.getElementById("loginMessage");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        message.textContent = "Signing in...";
+        message.className = "auth-message";
+
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+
+        try {
+          const response = await fetch("/api/v1/auth/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || "Login failed");
+          }
+
+          message.textContent = "Welcome back. Your session is ready.";
+          message.className = "auth-message success";
+          window.location.href = "/";
+        } catch (error) {
+          message.textContent = error.message;
+          message.className = "auth-message error";
+        }
+      });
+    </script>
+  </body>
+</html>

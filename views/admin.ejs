@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | BiteMe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/site.css" />
+    <script src="/js/ui.js"></script>
+  </head>
+  <body class="detail-page">
+    <header class="topbar detail-topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">B</span>
+        <span>BiteMe</span>
+      </a>
+      <div class="top-actions">
+        <a class="ghost-link" href="/orders">Orders</a>
+        <a class="pill-link" href="/profile">Profile</a>
+      </div>
+    </header>
+
+    <main class="detail-wrap">
+      <section class="detail-hero admin-hero">
+        <div>
+          <p class="eyebrow">Management</p>
+          <h1>Control the marketplace.</h1>
+          <p>
+            Manage restaurants, categories, foods, and orders from one workspace.
+          </p>
+        </div>
+        <div class="detail-metrics">
+          <div><strong><%= restaurantsCount %></strong><span>restaurants</span></div>
+          <div><strong><%= ordersCount %></strong><span>orders</span></div>
+          <div><strong><%= viewer.usertype %></strong><span>role</span></div>
+        </div>
+      </section>
+
+      <section class="section compact-section metrics-grid">
+        <div class="metric-card"><strong><%= usersCount %></strong><span>users</span></div>
+        <div class="metric-card"><strong><%= categoriesCount %></strong><span>categories</span></div>
+        <div class="metric-card"><strong><%= foodsCount %></strong><span>foods</span></div>
+        <div class="metric-card"><strong><%= ordersCount %></strong><span>orders</span></div>
+      </section>
+
+      <section class="section compact-section grid-two">
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Restaurant builder</p>
+              <h2>Create a restaurant.</h2>
+            </div>
+          </div>
+          <form id="restaurantForm" class="stack-form">
+            <label><span>Title</span><input type="text" name="title" required /></label>
+            <label><span>Address</span><input type="text" name="address" required /></label>
+            <label><span>Image URL</span><input type="text" name="imageUrl" /></label>
+            <label><span>Time</span><input type="text" name="time" placeholder="20-30 mins" /></label>
+            <label><span>Rating</span><input type="number" name="rating" step="0.1" min="0" max="5" /></label>
+            <div class="inline-grid">
+              <label><span>Pickup</span><select name="pickup"><option value="true">Yes</option><option value="false">No</option></select></label>
+              <label><span>Delivery</span><select name="delivery"><option value="true">Yes</option><option value="false">No</option></select></label>
+              <label><span>Open</span><select name="isOpen"><option value="true">Open</option><option value="false">Closed</option></select></label>
+            </div>
+            <button type="submit" class="auth-button" data-loading-text="Creating restaurant...">Create restaurant</button>
+            <p class="form-message" data-form-status></p>
+          </form>
+        </article>
+
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Category builder</p>
+              <h2>Create a category.</h2>
+            </div>
+          </div>
+          <form id="categoryForm" class="stack-form">
+            <label><span>Title</span><input type="text" name="title" required /></label>
+            <label><span>Image URL</span><input type="text" name="imageUrl" /></label>
+            <label>
+              <span>Restaurant</span>
+              <select name="restaurant" required>
+                <% restaurants.forEach((restaurant) => { %>
+                  <option value="<%= restaurant._id %>"><%= restaurant.title %></option>
+                <% }) %>
+              </select>
+            </label>
+            <button type="submit" class="auth-button" data-loading-text="Creating category...">Create category</button>
+            <p class="form-message" data-form-status></p>
+          </form>
+        </article>
+      </section>
+
+      <section class="section compact-section grid-two">
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Food builder</p>
+              <h2>Create a food item.</h2>
+            </div>
+          </div>
+          <form id="foodForm" class="stack-form">
+            <label><span>Title</span><input type="text" name="title" required /></label>
+            <label><span>Description</span><textarea name="description" rows="3"></textarea></label>
+            <label><span>Price</span><input type="number" name="price" min="0" step="0.01" required /></label>
+            <label><span>Image URL</span><input type="text" name="imageUrl" /></label>
+            <div class="inline-grid">
+              <label>
+                <span>Restaurant</span>
+                <select name="restaurant" required>
+                  <% restaurants.forEach((restaurant) => { %>
+                    <option value="<%= restaurant._id %>"><%= restaurant.title %></option>
+                  <% }) %>
+                </select>
+              </label>
+              <label>
+                <span>Category</span>
+                <select name="category" required>
+                  <% categories.forEach((category) => { %>
+                    <option value="<%= category._id %>"><%= category.title %></option>
+                  <% }) %>
+                </select>
+              </label>
+            </div>
+            <label><span>Ingredients</span><input type="text" name="ingredients" placeholder="comma separated" /></label>
+            <div class="inline-grid">
+              <label><span>Available</span><select name="isAvailable"><option value="true">Yes</option><option value="false">No</option></select></label>
+              <label><span>Rating</span><input type="number" name="rating" step="0.1" min="0" max="5" /></label>
+            </div>
+            <button type="submit" class="auth-button" data-loading-text="Creating food...">Create food</button>
+            <p class="form-message" data-form-status></p>
+          </form>
+        </article>
+
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Insights</p>
+              <h2>Orders and payment mix.</h2>
+            </div>
+          </div>
+          <div class="pill-list">
+            <% orderStatusBreakdown.forEach((item) => { %>
+              <span><%= item._id %>: <%= item.count %></span>
+            <% }) %>
+            <% paymentBreakdown.forEach((item) => { %>
+              <span><%= item._id %>: <%= item.count %></span>
+            <% }) %>
+          </div>
+        </article>
+      </section>
+
+      <section class="section compact-section">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Orders</p>
+            <h2>Update order status.</h2>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Buyer</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% orders.forEach((order) => { %>
+                <tr>
+                  <td><%= order.restaurant?.title || 'Restaurant' %></td>
+                  <td><%= order.buyer?.username || 'Customer' %></td>
+                  <td>₹<%= order.total %></td>
+                  <td><span class="rating"><%= order.status %></span></td>
+                  <td>
+                    <form class="inline-form order-status-form" data-order-id="<%= order._id %>">
+                      <select name="status">
+                        <% ['Pending','Preparing','Out for delivery','Delivered','Cancelled'].forEach((status) => { %>
+                          <option value="<%= status %>" <%= order.status === status ? 'selected' : '' %>><%= status %></option>
+                        <% }) %>
+                      </select>
+                      <button type="submit">Update</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <% if (viewer.usertype === 'admin') { %>
+        <section class="section compact-section">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Users</p>
+              <h2>Manage registered users.</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% users.forEach((user) => { %>
+                  <tr>
+                    <td><%= user.username %></td>
+                    <td><%= user.email %></td>
+                    <td><%= user.usertype %></td>
+                    <td>
+                      <% if (user._id.toString() !== viewer.id) { %>
+                        <form class="inline-form user-delete-form" data-user-id="<%= user._id %>">
+                          <button type="submit" class="danger-button small-button">Delete</button>
+                        </form>
+                      <% } else { %>
+                        <span class="muted-text">Current user</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      <% } %>
+    </main>
+
+    <script>
+      const parseBoolean = (value) => value === 'true';
+      const parseIngredients = (value) =>
+        (value || '')
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean);
+
+      window.BiteMeUI.bindAsyncForm(document.getElementById('restaurantForm'), async ({ form, status, setStatusMessage }) => {
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+        payload.pickup = parseBoolean(payload.pickup);
+        payload.delivery = parseBoolean(payload.delivery);
+        payload.isOpen = parseBoolean(payload.isOpen);
+        if (payload.rating) payload.rating = Number(payload.rating);
+
+        const response = await fetch('/api/v1/restaurant/createRestaurant', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Unable to create restaurant');
+        setStatusMessage(status, 'Restaurant created successfully.', 'success');
+        form.reset();
+      });
+
+      window.BiteMeUI.bindAsyncForm(document.getElementById('categoryForm'), async ({ form, status, setStatusMessage }) => {
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+        const response = await fetch('/api/v1/category/createCategory', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Unable to create category');
+        setStatusMessage(status, 'Category created successfully.', 'success');
+        form.reset();
+      });
+
+      window.BiteMeUI.bindAsyncForm(document.getElementById('foodForm'), async ({ form, status, setStatusMessage }) => {
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+        payload.price = Number(payload.price);
+        payload.rating = payload.rating ? Number(payload.rating) : undefined;
+        payload.isAvailable = parseBoolean(payload.isAvailable);
+        payload.ingredients = parseIngredients(payload.ingredients);
+
+        const response = await fetch('/api/v1/food/createFood', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Unable to create food');
+        setStatusMessage(status, 'Food item created successfully.', 'success');
+        form.reset();
+      });
+
+      document.querySelectorAll('.order-status-form').forEach((form) => {
+        window.BiteMeUI.bindAsyncForm(form, async ({ form, status, setStatusMessage }) => {
+          const orderId = form.dataset.orderId;
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+          const response = await fetch(`/api/v1/order/updateOrderStatus/${orderId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || 'Unable to update status');
+          setStatusMessage(status, 'Order status updated.', 'success');
+          setTimeout(() => window.location.reload(), 700);
+        });
+      });
+
+      document.querySelectorAll('.user-delete-form').forEach((form) => {
+        window.BiteMeUI.bindAsyncForm(form, async ({ status, setStatusMessage }) => {
+          const confirmDelete = window.confirm('Delete this user?');
+          if (!confirmDelete) {
+            setStatusMessage(status, 'Deletion cancelled.', 'success');
+            return;
+          }
+          const userId = form.dataset.userId;
+          const response = await fetch(`/api/v1/user/deleteUser/${userId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || 'Unable to delete user');
+          setStatusMessage(status, 'User deleted.', 'success');
+          setTimeout(() => window.location.reload(), 700);
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout | BiteMe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/site.css" />
+    <script src="/js/ui.js"></script>
+  </head>
+  <body class="detail-page">
+    <header class="topbar detail-topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">B</span>
+        <span>BiteMe</span>
+      </a>
+      <div class="top-actions">
+        <a class="ghost-link" href="/food/<%= food._id %>">Back to food</a>
+        <a class="pill-link" href="/orders">Orders</a>
+      </div>
+    </header>
+
+    <main class="detail-wrap">
+      <section class="detail-hero">
+        <div>
+          <p class="eyebrow">Checkout</p>
+          <h1><%= food.title %></h1>
+          <p>
+            Confirm the quantity, add your delivery address, and place the
+            order.
+          </p>
+          <div class="feature-meta">
+            <span>₹<%= food.price %> each</span>
+            <span><%= food.restaurant?.title %></span>
+            <span><%= food.category?.title || 'Menu item' %></span>
+          </div>
+        </div>
+        <div class="detail-metrics">
+          <div>
+            <strong><%= food.restaurant?.time || '20' %></strong
+            ><span>mins</span>
+          </div>
+          <div>
+            <strong><%= food.isAvailable ? 'Ready' : 'Sold out' %></strong
+            ><span>status</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section compact-section grid-two">
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Order summary</p>
+              <h2>Your food and total preview.</h2>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div>
+              <strong><%= food.title %></strong>
+              <span
+                ><%= food.description || 'Freshly prepared and ready to go.'
+                %></span
+              >
+            </div>
+            <div>
+              <strong>₹<%= food.price %></strong>
+              <span>base price</span>
+            </div>
+          </div>
+          <div class="empty-state compact-empty">
+            Total updates automatically when quantity changes.
+          </div>
+        </article>
+
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Delivery</p>
+              <h2>Place the order.</h2>
+            </div>
+          </div>
+          <form id="checkoutForm" class="stack-form">
+            <label>
+              <span>Quantity</span>
+              <input type="number" name="quantity" min="1" value="1" required />
+            </label>
+            <label>
+              <span>Address</span>
+              <textarea
+                name="address"
+                rows="3"
+                placeholder="Delivery address"
+                required
+              >
+<%= defaultAddress %></textarea
+              >
+            </label>
+            <label>
+              <span>Payment type</span>
+              <select name="paymentType">
+                <option value="COD">Cash on delivery</option>
+                <option value="Card">Card</option>
+              </select>
+            </label>
+            <button
+              type="submit"
+              class="auth-button"
+              data-loading-text="Placing order..."
+            >
+              Place order
+            </button>
+            <p class="form-message" data-form-status></p>
+          </form>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById('checkoutForm');
+      const food = <%- JSON.stringify(food) %>;
+
+      window.BiteMeUI.bindAsyncForm(form, async ({ form, status, setStatusMessage }) => {
+        const formData = new FormData(form);
+        const payload = {
+          foods: [{ food: food._id, quantity: Number(formData.get('quantity') || 1) }],
+          restaurant: food.restaurant._id,
+          address: formData.get('address'),
+          paymentType: formData.get('paymentType'),
+        };
+
+        const response = await fetch('/api/v1/order/createOrder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || 'Unable to place order');
+        }
+
+        setStatusMessage(status, 'Order placed successfully. Redirecting to your orders...', 'success');
+        setTimeout(() => {
+          window.location.href = '/orders';
+        }, 900);
+      });
+    </script>
+  </body>
+</html>

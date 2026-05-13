@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Detail | BiteMe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/site.css" />
+  </head>
+  <body class="detail-page">
+    <header class="topbar detail-topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">B</span>
+        <span>BiteMe</span>
+      </a>
+      <div class="top-actions">
+        <a class="ghost-link" href="/orders">Orders</a>
+        <a class="pill-link" href="/profile">Profile</a>
+      </div>
+    </header>
+
+    <main class="detail-wrap">
+      <section class="detail-hero">
+        <div>
+          <p class="eyebrow">Order tracking</p>
+          <h1><%= order.restaurant?.title || 'Order' %></h1>
+          <p><%= order.address %></p>
+          <div class="feature-meta">
+            <span><%= order.status %></span>
+            <span><%= order.paymentType %></span>
+            <span>₹<%= order.total %></span>
+          </div>
+        </div>
+        <div class="detail-metrics">
+          <div><strong><%= new Date(order.createdAt).toLocaleDateString() %></strong><span>placed</span></div>
+          <div><strong><%= order.foods.length %></strong><span>items</span></div>
+        </div>
+      </section>
+
+      <section class="section compact-section grid-two">
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Timeline</p>
+              <h2>Status history.</h2>
+            </div>
+          </div>
+          <div class="timeline">
+            <% ['Pending','Preparing','Out for delivery','Delivered'].forEach((step) => { %>
+              <div class="timeline-item <%= order.status === step ? 'active' : '' %>">
+                <span></span>
+                <div>
+                  <strong><%= step %></strong>
+                  <p>Order progress</p>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </article>
+
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Delivery</p>
+              <h2>Restaurant and buyer info.</h2>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div>
+              <strong><%= order.buyer?.username || 'Customer' %></strong>
+              <span><%= order.buyer?.email || '' %></span>
+            </div>
+            <div>
+              <strong><%= order.restaurant?.title || '' %></strong>
+              <span><%= order.restaurant?.address || '' %></span>
+            </div>
+          </div>
+          <div class="card-actions compact-actions">
+            <a href="/restaurant/<%= order.restaurant?._id %>">Open restaurant</a>
+            <a href="/orders">Back to orders</a>
+          </div>
+        </article>
+      </section>
+
+      <section class="section compact-section">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Items</p>
+            <h2>What is in the order.</h2>
+          </div>
+        </div>
+        <div class="food-grid">
+          <% order.foods.forEach((item) => { %>
+            <article class="food-card">
+              <div class="food-top">
+                <span class="food-price">₹<%= item.price %></span>
+                <span class="food-status">Qty <%= item.quantity %></span>
+              </div>
+              <h3><%= item.title %></h3>
+              <p><%= item.food?.title || 'Menu item' %></p>
+            </article>
+          <% }) %>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

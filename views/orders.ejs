@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orders | BiteMe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/site.css" />
+    <script defer src="/js/ui.js"></script>
+  </head>
+  <body class="detail-page">
+    <header class="topbar detail-topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">B</span>
+        <span>BiteMe</span>
+      </a>
+      <div class="top-actions">
+        <a class="ghost-link" href="/profile">Profile</a>
+        <a class="pill-link" href="/">Home</a>
+      </div>
+    </header>
+
+    <main class="detail-wrap">
+      <section class="detail-hero">
+        <div>
+          <p class="eyebrow">Orders</p>
+          <h1>Track your recent deliveries.</h1>
+          <p>
+            Review order status, payment type, restaurant details, and total cost.
+          </p>
+        </div>
+        <div class="detail-metrics">
+          <div><strong><%= orders.length %></strong><span>orders</span></div>
+          <div><strong><%= viewer.usertype %></strong><span>role</span></div>
+        </div>
+      </section>
+
+      <section class="section compact-section">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Overview</p>
+            <h2>Your order list at a glance.</h2>
+          </div>
+        </div>
+        <div class="card-grid">
+          <% if (orders.length) { %>
+            <% orders.forEach((order) => { %>
+              <article class="restaurant-card order-card">
+                <div class="restaurant-body">
+                  <div class="card-row">
+                    <h3><%= order.restaurant?.title || 'Restaurant' %></h3>
+                    <span class="rating"><%= order.status %></span>
+                  </div>
+                  <p><%= order.address %></p>
+                  <div class="card-meta">
+                    <span>₹<%= order.total %></span>
+                    <span><%= order.paymentType %></span>
+                    <span><%= new Date(order.createdAt).toLocaleDateString() %></span>
+                  </div>
+                  <div class="card-actions compact-actions">
+                    <a href="/orders/<%= order._id %>">Track order</a>
+                    <a href="/restaurant/<%= order.restaurant?._id %>">Restaurant</a>
+                  </div>
+                </div>
+              </article>
+            <% }) %>
+          <% } else { %>
+            <div class="empty-state">You have no orders yet.</div>
+          <% } %>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

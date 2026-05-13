@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= restaurant ? restaurant.title : 'Restaurant' %> | BiteMe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/site.css" />
+  </head>
+  <body class="detail-page">
+    <header class="topbar detail-topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">B</span>
+        <span>BiteMe</span>
+      </a>
+      <div class="top-actions">
+        <a class="ghost-link" href="/">Back home</a>
+        <a class="pill-link" href="/orders">Orders</a>
+      </div>
+    </header>
+
+    <main class="detail-wrap">
+      <% if (restaurant) { %>
+        <section class="detail-hero">
+          <div>
+            <p class="eyebrow">Restaurant overview</p>
+            <h1><%= restaurant.title %></h1>
+            <p><%= restaurant.address %></p>
+          </div>
+          <div class="detail-metrics">
+            <div><strong><%= restaurant.time %></strong><span>mins</span></div>
+            <div><strong><%= restaurant.rating || '4.4' %></strong><span>rating</span></div>
+            <div><strong><%= restaurant.isOpen ? 'Open' : 'Closed' %></strong><span>status</span></div>
+          </div>
+        </section>
+
+        <section class="section strip-section">
+          <div class="strip-head">
+            <p class="eyebrow">Similar feel</p>
+            <h2>Similar kitchens and categories from the same area.</h2>
+          </div>
+          <div class="cuisine-strip">
+            <% if (categories.length) { %>
+              <% categories.forEach((category) => { %>
+                <a class="cuisine-chip" href="#menu">
+                  <span><%= category.title %></span>
+                  <small>Category</small>
+                </a>
+              <% }) %>
+            <% } else { %>
+              <div class="empty-state compact-empty">No additional categories here yet.</div>
+            <% } %>
+          </div>
+        </section>
+
+        <section class="section compact-section">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Categories</p>
+              <h2>What this kitchen is serving right now.</h2>
+            </div>
+          </div>
+          <div class="chip-grid compact-grid">
+            <% if (categories.length) { %>
+              <% categories.forEach((category) => { %>
+                <article class="chip-card">
+                  <h3><%= category.title %></h3>
+                  <p>Ready to browse and order.</p>
+                </article>
+              <% }) %>
+            <% } else { %>
+              <div class="empty-state">No categories yet for this restaurant.</div>
+            <% } %>
+          </div>
+        </section>
+
+        <section class="section compact-section" id="menu">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Menu</p>
+              <h2>Foods attached to this restaurant.</h2>
+            </div>
+          </div>
+          <div class="food-grid">
+            <% if (foods.length) { %>
+              <% foods.forEach((food) => { %>
+                <article class="food-card">
+                  <div class="food-top">
+                    <span class="food-price">₹<%= food.price %></span>
+                    <span class="food-status"><%= food.isAvailable ? 'Available' : 'Sold out' %></span>
+                  </div>
+                  <h3><%= food.title %></h3>
+                  <p><%= food.description || 'Made fresh to order.' %></p>
+                  <div class="food-foot">
+                    <span><%= food.category?.title || 'Menu item' %></span>
+                  </div>
+                  <div class="card-actions compact-actions">
+                    <a href="/food/<%= food._id %>">View food</a>
+                    <% if (viewer) { %>
+                      <a href="/checkout/<%= food._id %>">Checkout</a>
+                    <% } else { %>
+                      <a href="/login">Sign in</a>
+                    <% } %>
+                  </div>
+                </article>
+              <% }) %>
+            <% } else { %>
+              <div class="empty-state">No foods listed yet for this restaurant.</div>
+            <% } %>
+          </div>
+        </section>
+      <% } else { %>
+        <section class="detail-hero">
+          <div>
+            <p class="eyebrow">Restaurant not found</p>
+            <h1>This restaurant page is empty.</h1>
+            <p>Go back home and open a restaurant that’s already in the system.</p>
+          </div>
+        </section>
+      <% } %>
+    </main>
+  </body>
+</html>

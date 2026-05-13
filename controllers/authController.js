@@ -2,13 +2,30 @@ const userModel = require("../models/userModel.js");
 const bcrypt = require("bcryptjs");
 const JWT = require("jsonwebtoken");
 
+const buildAuthCookie = (token) => {
+  const maxAge = 7 * 24 * 60 * 60;
+  const cookieParts = [
+    `bitemeToken=${token}`,
+    "Path=/",
+    `Max-Age=${maxAge}`,
+    "SameSite=Lax",
+    "HttpOnly",
+  ];
+
+  if (process.env.NODE_ENV === "production") {
+    cookieParts.push("Secure");
+  }
+
+  return cookieParts.join("; ");
+};
+
 //REGISTER
 const registerController = async (req, res) => {
   try {
-    const { username, email, password, phone, address } = req.body;
+    const { username, email, password, phone, address, answer } = req.body;
 
     //validation if all needed things are present
-    if (!username || !email || !password || !phone || !address) {
+    if (!username || !email || !password || !phone || !address || !answer) {
       return res.status(500).send({
         message: "please provide all fields",
       });
@@ -33,6 +50,7 @@ const registerController = async (req, res) => {
       password: hashedPassword,
       address,
       phone,
+      answer,
     });
     res.status(201).send({
       message: "successfully registered",
@@ -76,16 +94,17 @@ const loginController = async (req, res) => {
       });
     }
     //token generation
-    const token = JWT.sign({ id: user._id },process.env.JWT_SECRET,{
-        expiresIn:"7d"
+    const token = JWT.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
     });
-    
+
+    res.setHeader("Set-Cookie", buildAuthCookie(token));
+
     res.status(200).send({
       message: "Login Successfully",
       token,
       user,
     });
-
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -95,4 +114,24 @@ const loginController = async (req, res) => {
   }
 };
 
-module.exports = { registerController, loginController };
+const logoutController = async (req, res) => {
+  try {
+    res.setHeader(
+      "Set-Cookie",
+      "bitemeToken=; Path=/; Max-Age=0; SameSite=Lax",
+    );
+    return res.status(200).send({
+      success: true,
+      message: "Logout successful",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({
+      success: false,
+      message: "Error in logout API",
+      error,
+    });
+  }
+};
+
+module.exports = { registerController, loginController, logoutController };

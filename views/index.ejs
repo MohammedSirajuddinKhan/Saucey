@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BiteMe | Food Delivery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/site.css" />
+    <script defer src="/js/ui.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">B</span>
+        <span>BiteMe</span>
+      </a>
+      <nav class="topnav">
+        <a href="#restaurants">Restaurants</a>
+        <a href="#categories">Categories</a>
+        <a href="#foods">Popular Foods</a>
+      </nav>
+      <% if (viewer) { %>
+        <div class="top-actions account-actions">
+          <span class="account-pill"><%= viewer.username %></span>
+          <a class="ghost-link" href="/profile">Profile</a>
+          <a class="ghost-link" href="/orders">Orders</a>
+          <% if (["admin", "vendor"].includes(viewer.usertype)) { %>
+            <a class="ghost-link" href="/admin">Manage</a>
+          <% } %>
+          <a class="pill-link" href="#" data-logout>Logout</a>
+        </div>
+      <% } else { %>
+        <div class="top-actions">
+          <a class="ghost-link" href="/register">Create account</a>
+          <a class="pill-link" href="/login">Login</a>
+        </div>
+      <% } %>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Fast food delivery, made simple</p>
+          <h1>Fresh meals from local kitchens, delivered fast.</h1>
+          <p class="hero-text">
+            Discover restaurants, browse curated categories, and move straight
+            into dishes worth ordering again.
+          </p>
+
+          <form class="searchbar" action="/" method="get">
+            <input
+              type="text"
+              name="q"
+              value="<%= query %>"
+              placeholder="Search restaurants, dishes, or cuisines"
+            />
+            <button type="submit">Search</button>
+          </form>
+
+          <div class="hero-stats">
+            <div>
+              <strong><%= stats.restaurants %></strong>
+              <span>Restaurants</span>
+            </div>
+            <div>
+              <strong><%= stats.categories %></strong>
+              <span>Categories</span>
+            </div>
+            <div>
+              <strong><%= stats.foods %></strong>
+              <span>Foods</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <% if (featuredRestaurant) { %>
+            <div class="feature-card">
+              <p class="feature-label">Featured spot</p>
+              <h2><%= featuredRestaurant.title %></h2>
+              <p><%= featuredRestaurant.address %></p>
+              <div class="feature-meta">
+                <span><%= featuredRestaurant.time %> mins</span>
+                <span><%= featuredRestaurant.rating %> rating</span>
+                <span><%= featuredRestaurant.isOpen ? 'Open now' : 'Closed' %></span>
+              </div>
+              <a class="feature-link" href="/restaurant/<%= featuredRestaurant._id %>">View restaurant</a>
+            </div>
+          <% } else { %>
+            <div class="feature-card empty">
+                <p class="feature-label">No featured restaurant yet</p>
+                <h2>Add your first restaurant</h2>
+                <p>Once your first restaurant is added, this panel becomes the focal point of the page.</p>
+            </div>
+          <% } %>
+        </div>
+      </section>
+
+      <section class="section strip-section">
+        <div class="strip-head">
+          <p class="eyebrow">Quick filters</p>
+          <h2>Browse the way people actually order food.</h2>
+        </div>
+        <div class="cuisine-strip">
+          <% if (cuisineChips.length) { %>
+            <% cuisineChips.forEach((chip) => { %>
+              <a class="cuisine-chip" href="#restaurants">
+                <span><%= chip.title %></span>
+                <small><%= chip.restaurant?.title || 'Popular' %></small>
+              </a>
+            <% }) %>
+          <% } else { %>
+            <div class="empty-state compact-empty">No quick filters yet.</div>
+          <% } %>
+        </div>
+      </section>
+
+      <section class="section" id="categories">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Browse by vibe</p>
+            <h2>Categories that feel curated and easy to explore.</h2>
+          </div>
+        </div>
+
+        <div class="chip-grid">
+          <% if (categories.length) { %>
+            <% categories.forEach((category) => { %>
+              <article class="chip-card">
+                <span class="chip-badge"><%= category.restaurant?.title || 'Restaurant' %></span>
+                <h3><%= category.title %></h3>
+                <p>Fast-moving selections for the way people actually browse food.</p>
+              </article>
+            <% }) %>
+          <% } else { %>
+            <div class="empty-state">No categories available yet.</div>
+          <% } %>
+        </div>
+      </section>
+
+      <section class="section" id="restaurants">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Top restaurants</p>
+            <h2>Built for a modern food marketplace.</h2>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <% if (restaurants.length) { %>
+            <% restaurants.forEach((restaurant) => { %>
+              <article class="restaurant-card">
+                <div class="restaurant-visual">
+                  <span><%= restaurant.title.charAt(0) %></span>
+                </div>
+                <div class="restaurant-body">
+                  <div class="card-row">
+                    <h3><%= restaurant.title %></h3>
+                    <span class="rating"><%= restaurant.rating || '4.4' %></span>
+                  </div>
+                  <p><%= restaurant.address %></p>
+                  <div class="card-meta">
+                    <span><%= restaurant.time %> mins</span>
+                    <span><%= restaurant.delivery ? 'Delivery' : 'Pickup only' %></span>
+                    <span><%= restaurant.isOpen ? 'Open now' : 'Closed' %></span>
+                  </div>
+                  <div class="card-actions">
+                    <a href="/restaurant/<%= restaurant._id %>">Open menu</a>
+                    <a href="/restaurant/<%= restaurant._id %>#menu">Browse dishes</a>
+                  </div>
+                </div>
+              </article>
+            <% }) %>
+          <% } else { %>
+            <div class="empty-state">No restaurants match your search.</div>
+          <% } %>
+        </div>
+      </section>
+
+      <section class="section" id="foods">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Popular dishes</p>
+            <h2>Dishes presented the way customers expect to see them.</h2>
+          </div>
+        </div>
+
+        <div class="food-grid">
+          <% if (foods.length) { %>
+            <% foods.forEach((food) => { %>
+              <article class="food-card">
+                <div class="food-top">
+                  <span class="food-price">₹<%= food.price %></span>
+                  <span class="food-status"><%= food.isAvailable ? 'Available' : 'Sold out' %></span>
+                </div>
+                <h3><%= food.title %></h3>
+                <p><%= food.description || 'Freshly prepared and ready to go.' %></p>
+                <div class="food-foot">
+                  <span><%= food.restaurant?.title || 'Restaurant' %></span>
+                  <span><%= food.category?.title || 'Featured' %></span>
+                </div>
+                <div class="card-actions compact-actions">
+                  <a href="/food/<%= food._id %>">View details</a>
+                  <% if (viewer) { %>
+                    <a href="/checkout/<%= food._id %>">Order now</a>
+                  <% } else { %>
+                    <a href="/login">Sign in to order</a>
+                  <% } %>
+                </div>
+              </article>
+            <% }) %>
+          <% } else { %>
+            <div class="empty-state">No foods available yet.</div>
+          <% } %>
+        </div>
+      </section>
+    </main>
+
+    <nav class="mobile-nav" aria-label="Quick navigation">
+      <a href="/#restaurants">
+        <span>Home</span>
+      </a>
+      <a href="/#foods">
+        <span>Food</span>
+      </a>
+      <a href="/#categories">
+        <span>Categories</span>
+      </a>
+      <% if (viewer) { %>
+        <a href="/orders">
+          <span>Orders</span>
+        </a>
+        <a href="/profile">
+          <span>Profile</span>
+        </a>
+      <% } else { %>
+        <a href="/login">
+          <span>Login</span>
+        </a>
+      <% } %>
+    </nav>
+  </body>
+</html>
