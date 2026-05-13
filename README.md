@@ -2,6 +2,8 @@
 
 A full-stack food delivery application built with **Express.js** and **MongoDB**, featuring an EJS-based frontend with modern UI, role-based access control, and serverless deployment on Vercel.
 
+**🌐 Live Demo**: [https://bite-me-eta.vercel.app/](https://bite-me-eta.vercel.app/)
+
 ## 🚀 Features
 
 - **User Management**: Registration, login, profile management with JWT-based authentication
